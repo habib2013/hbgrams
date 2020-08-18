@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "764061746821",
+    "firebase_url": "https://hbgrams-d82bd.firebaseio.com",
+    "project_id": "hbgrams-d82bd",
+    "storage_bucket": "hbgrams-d82bd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:764061746821:android:8042078daba824522bcbec",
+        "android_client_info": {
+          "package_name": "nimblevend.hbgrams"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "764061746821-rmb80bqni5erp0t3dt29frjm0fuo9tjl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "nimblevend.hbgrams",
+            "certificate_hash": "4bff108ea3a9e4235b54a41e23ea0fd860456228"
+          }
+        },
+        {
+          "client_id": "764061746821-k1dftulb5a7tuifgq7ls0ueue9ndhgcs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBA1Kp9ClplaB4KBO7prZuFenEVfXFLuqg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "764061746821-k1dftulb5a7tuifgq7ls0ueue9ndhgcs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
