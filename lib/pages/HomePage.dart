@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hbgrams/pages/CreateAccountPage.dart';
 import 'package:hbgrams/pages/NotificationsPage.dart';
 import 'package:hbgrams/pages/ProfilePage.dart';
 import 'package:hbgrams/pages/SearchPage.dart';
@@ -6,11 +8,9 @@ import 'package:hbgrams/pages/UploadPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hbgrams/pages/splash.dart';
-import 'package:hbgrams/utils/firebase_auth.dart';
 
 final GoogleSignIn gSignIn =  GoogleSignIn();
+final usersReference = Firestore.instance.collection("users");
 
 class HomePage extends StatefulWidget {
   @override
@@ -25,15 +25,37 @@ class _HomePageState extends State<HomePage> {
   void initState(){
     super.initState();
     pageController = PageController();
+
+    gSignIn.onCurrentUserChanged.listen((gSignInAccount) {
+      controlSigninIn(gSignInAccount);
+    },onError: (gError){
+      print('error message' + gError);
+    });
+
+
+    gSignIn.signInSilently(suppressErrors: false).then((gSignInAccount) {
+      controlSigninIn(gSignInAccount);
+    }).catchError((gError) {
+      print('error message' + gError);
+    });
+
   }
 
+  controlSigninIn(GoogleSignInAccount signInAccount) async{
+    if (signInAccount != null)
+    {
+//      await saveUserInfoToFirestore();
+      setState(() {
+        isSignedIn = true;
+      });
+    }
+    else{
+      setState(() {
+        isSignedIn = false;
+      });
+    }
 
-  loginUser() async{
-    bool res = await AuthProvider().loginWithGoogle();
-    if(!res)
-      print("error logging in with google");
   }
-
 
   void dispose(){
     pageController.dispose();
@@ -41,13 +63,22 @@ class _HomePageState extends State<HomePage> {
 
   }
 
-//  loginUser(){
-//    gSignIn.signIn();
-//  }
+//  saveUserInfoToFirestore() async{
+//    final GoogleSignInAccount gCurrentUser = gSignIn.currentUser;
+//    DocumentSnapshot documentSnapShot = await usersReference.document(gCurrentUser.id).get();
 //
-//  logoutUser(){
-//    gSignIn.signOut();
+//    if(!documentSnapShot.exists){
+//      final username = await Navigator.push(context, MaterialPageRoute(builder: (context) => CreateAccountPage()));
+//    }
 //  }
+
+  loginUser(){
+    gSignIn.signIn();
+  }
+
+  logoutUser(){
+    gSignIn.signOut();
+  }
 
   whenPageChanges(int pageIndex){
     setState(() {
@@ -58,37 +89,36 @@ class _HomePageState extends State<HomePage> {
     pageController.animateToPage(pageIndex, duration: Duration(milliseconds: 400), curve: Curves.bounceInOut,);
   }
 
-
-   Scaffold buildHomeScreen() {
+  Scaffold buildHomeScreen() {
 //    return RaisedButton.icon(onPressed: logoutUser, icon: Icon(Icons.close), label: Text("Sign Out User"));
-   return Scaffold(
-     body: PageView(
-       children: [
-        TimeLinePage(),
-         SearchPage(),
-         UploadPage(),
-         NotificationsPage(),
-         ProfilePage()
-       ],
-       physics: NeverScrollableScrollPhysics(),
-       controller: pageController,
-       onPageChanged: whenPageChanges,
-     ),
-     bottomNavigationBar: CupertinoTabBar(
-       currentIndex: getPageIndex,
-       onTap: onTapChangePage,
-       activeColor: Colors.white,
-       inactiveColor: Colors.blueGrey,
-       backgroundColor: Theme.of(context).accentColor,
-       items: [
-         BottomNavigationBarItem(icon: Icon(Icons.home),),
-         BottomNavigationBarItem(icon: Icon(Icons.search)),
-         BottomNavigationBarItem(icon: Icon(Icons.photo_camera,size: 37.0,)),
-         BottomNavigationBarItem(icon: Icon(Icons.favorite)),
-         BottomNavigationBarItem(icon: Icon(Icons.person)),
-       ],
-     ),
-   );
+    return Scaffold(
+      body: PageView(
+        children: [
+          TimeLinePage(),
+          SearchPage(),
+          UploadPage(),
+          NotificationsPage(),
+          ProfilePage()
+        ],
+        physics: NeverScrollableScrollPhysics(),
+        controller: pageController,
+        onPageChanged: whenPageChanges,
+      ),
+      bottomNavigationBar: CupertinoTabBar(
+        currentIndex: getPageIndex,
+        onTap: onTapChangePage,
+        activeColor: Colors.white,
+        inactiveColor: Colors.blueGrey,
+        backgroundColor: Theme.of(context).accentColor,
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home),),
+          BottomNavigationBarItem(icon: Icon(Icons.search)),
+          BottomNavigationBarItem(icon: Icon(Icons.photo_camera,size: 37.0,)),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite)),
+          BottomNavigationBarItem(icon: Icon(Icons.person)),
+        ],
+      ),
+    );
   }
 
   Scaffold buildSignInScreen() {
@@ -110,10 +140,8 @@ class _HomePageState extends State<HomePage> {
             ),
             RaisedButton(
               child: Text("Login with Google"),
-              onPressed: () async {
-                bool res = await AuthProvider().loginWithGoogle();
-                if(!res)
-                  print("error logging in with google");
+              onPressed: (){
+                loginUser();
               },
             ),
           ],
@@ -124,15 +152,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: FirebaseAuth.instance.onAuthStateChanged,
-      builder: (context,AsyncSnapshot<FirebaseUser> snapshot) {
-//        if(snapshot.connectionState == ConnectionState.waiting)
-//          return SplashPage();
-        if(!snapshot.hasData || snapshot.data == null)
-          return buildSignInScreen();
-        return buildHomeScreen();
-      },
-    );
+    if (isSignedIn) {
+      return buildHomeScreen();
+
+    } else {
+      return buildSignInScreen();
+    }
   }
 }
