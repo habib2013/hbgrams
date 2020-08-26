@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:hbgrams/models/user.dart';
 import 'package:hbgrams/pages/CreateAccountPage.dart';
 import 'package:hbgrams/pages/NotificationsPage.dart';
 import 'package:hbgrams/pages/ProfilePage.dart';
@@ -8,9 +10,15 @@ import 'package:hbgrams/pages/UploadPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hbgrams/models/user.dart';
 
 final GoogleSignIn gSignIn =  GoogleSignIn();
 final usersReference = Firestore.instance.collection("users");
+final StorageReference storageReference =FirebaseStorage.instance.ref().child('Posts Pictures');
+final postsReference = Firestore.instance.collection('posts');
+
+final DateTime timestamp = DateTime.now();
+User currentUser;
 
 class HomePage extends StatefulWidget {
   @override
@@ -44,7 +52,7 @@ class _HomePageState extends State<HomePage> {
   controlSigninIn(GoogleSignInAccount signInAccount) async{
     if (signInAccount != null)
     {
-//      await saveUserInfoToFirestore();
+      await saveUserInfoToFirestore();
       setState(() {
         isSignedIn = true;
       });
@@ -63,14 +71,28 @@ class _HomePageState extends State<HomePage> {
 
   }
 
-//  saveUserInfoToFirestore() async{
-//    final GoogleSignInAccount gCurrentUser = gSignIn.currentUser;
-//    DocumentSnapshot documentSnapShot = await usersReference.document(gCurrentUser.id).get();
-//
-//    if(!documentSnapShot.exists){
-//      final username = await Navigator.push(context, MaterialPageRoute(builder: (context) => CreateAccountPage()));
-//    }
-//  }
+  saveUserInfoToFirestore() async{
+    final GoogleSignInAccount gCurrentUser = gSignIn.currentUser;
+    DocumentSnapshot documentSnapShot = await usersReference.document(gCurrentUser.id).get();
+
+    if(!documentSnapShot.exists){
+      final username = await Navigator.push(context, MaterialPageRoute(builder: (context) => CreateAccountPage()));
+
+      usersReference.document(gCurrentUser.id).setData({
+        "id": gCurrentUser.id,
+        "profileName": gCurrentUser.displayName,
+        "username": username,
+        "url": gCurrentUser.photoUrl,
+        "email": gCurrentUser.email,
+        "bio": "",
+        "timestamp": timestamp
+      });
+      documentSnapShot = await usersReference.document(gCurrentUser.id).get();
+
+    }
+
+    currentUser = User.fromDocument(documentSnapShot);
+  }
 
   loginUser(){
     gSignIn.signIn();
@@ -94,9 +116,9 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: PageView(
         children: [
-          TimeLinePage(),
+          RaisedButton.icon(onPressed: logoutUser, icon: Icon(Icons.close), label: Text("Sign Out User")),
           SearchPage(),
-          UploadPage(),
+          UploadPage(gCurrentUser: currentUser,),
           NotificationsPage(),
           ProfilePage()
         ],
