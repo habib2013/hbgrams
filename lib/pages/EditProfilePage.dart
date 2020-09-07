@@ -1,6 +1,9 @@
 import "package:flutter/material.dart";
 
 class EditProfilePage extends StatefulWidget {
+ final String currentOnlineUserId;
+
+ EditProfilePage({this.currentOnlineUserId});
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }

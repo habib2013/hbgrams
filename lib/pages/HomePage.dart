@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> {
           SearchPage(),
           UploadPage(gCurrentUser: currentUser,),
           NotificationsPage(),
-          ProfilePage()
+          ProfilePage(userProfileId: currentUser)
         ],
         physics: NeverScrollableScrollPhysics(),
         controller: pageController,

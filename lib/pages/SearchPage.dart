@@ -14,92 +14,102 @@ class SearchPage extends StatefulWidget {
   _SearchPageState createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage> with AutomaticKeepAliveClientMixin<SearchPage>
-{
+class _SearchPageState extends State<SearchPage>
+    with AutomaticKeepAliveClientMixin<SearchPage> {
   TextEditingController searchTextEditingController = TextEditingController();
   Future<QuerySnapshot> futureSearchResults;
 
-  emptyTextFormField(){
+  emptyTextFormField() {
     searchTextEditingController.clear();
   }
-  controlSearching(String str){
-    Future<QuerySnapshot> allUsers = usersReference.where("profileName",isGreaterThanOrEqualTo: str).getDocuments();
+
+  controlSearching(String str) {
+    Future<QuerySnapshot> allUsers = usersReference
+        .where("profileName", isGreaterThanOrEqualTo: str)
+        .getDocuments();
     setState(() {
       futureSearchResults = allUsers;
     });
   }
 
-
-  AppBar searchPageHeader(){
+  AppBar searchPageHeader() {
     return AppBar(
       backgroundColor: Colors.black,
       title: TextFormField(
-        style: TextStyle(fontSize: 18.0,color: Colors.white) ,
+        style: TextStyle(fontSize: 18.0, color: Colors.white),
         controller: searchTextEditingController,
         decoration: InputDecoration(
           hintText: "Search Here ...",
           hintStyle: TextStyle(color: Colors.grey),
           enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.grey
-            ),
+            borderSide: BorderSide(color: Colors.grey),
           ),
           focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.white),
           ),
           filled: true,
-          prefixIcon: Icon(Icons.person_pin,color: Colors.white,size: 30.0,),
-          suffixIcon: IconButton(icon:Icon(Icons.clear,color: Colors.white,) ,onPressed: emptyTextFormField,),
+          prefixIcon: Icon(
+            Icons.person_pin,
+            color: Colors.white,
+            size: 30.0,
+          ),
+          suffixIcon: IconButton(
+            icon: Icon(
+              Icons.clear,
+              color: Colors.white,
+            ),
+            onPressed: emptyTextFormField,
+          ),
         ),
         onFieldSubmitted: controlSearching,
       ),
     );
   }
 
- Container displayNoSearchResultScreen(){
+  Container displayNoSearchResultScreen() {
     final Orientation orientation = MediaQuery.of(context).orientation;
     return Container(
       child: Center(
         child: ListView(
           shrinkWrap: true,
           children: [
-            Icon(Icons.group,color: Colors.grey,size: 200.0,),
+            Icon(
+              Icons.group,
+              color: Colors.grey,
+              size: 200.0,
+            ),
             Text(
               "Search Users",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500,fontSize: 65.0 ),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 65.0),
             )
-
           ],
         ),
       ),
     );
   }
 
-  displayUsersFoundScreen(){
-      return FutureBuilder(
-        future: futureSearchResults,
-        builder: (context,dataSnapShot)
-        {
-          if (!dataSnapShot.hasData)
-          {
-            return circularProgress();
-          }
+  displayUsersFoundScreen() {
+    return FutureBuilder(
+      future: futureSearchResults,
+      builder: (context, dataSnapShot) {
+        if (!dataSnapShot.hasData) {
+          return circularProgress();
+        }
 
-          List<UserResult> searchUsersResult = [];
-          dataSnapShot.data.documents.forEach((document)
-          {
-            User eachUser = User.fromDocument(document);
-            UserResult userResult = UserResult(eachUser);
-            searchUsersResult.add(userResult);
-          });
+        List<UserResult> searchUsersResult = [];
+        dataSnapShot.data.documents.forEach((document) {
+          User eachUser = User.fromDocument(document);
+          UserResult userResult = UserResult(eachUser);
+          searchUsersResult.add(userResult);
+        });
 
-          return ListView(
-            children:
-            searchUsersResult
-          );
-        },
-      );
+        return ListView(children: searchUsersResult);
+      },
+    );
   }
 
   bool get wantKeepAlive => true;
@@ -109,8 +119,9 @@ class _SearchPageState extends State<SearchPage> with AutomaticKeepAliveClientMi
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: searchPageHeader(),
-      body: futureSearchResults == null ? displayNoSearchResultScreen() : displayUsersFoundScreen(),
-
+      body: futureSearchResults == null
+          ? displayNoSearchResultScreen()
+          : displayUsersFoundScreen(),
     );
   }
 }
@@ -119,6 +130,7 @@ class UserResult extends StatelessWidget {
   final User eachUser;
 
   UserResult(this.eachUser);
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -129,22 +141,26 @@ class UserResult extends StatelessWidget {
           children: [
             RaisedButton(
               child: ListTile(
-                leading: CircleAvatar(backgroundColor: Colors.black,backgroundImage: CachedNetworkImageProvider(eachUser.url),),
-                title: Text(eachUser.profileName,style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold
+                leading: CircleAvatar(
+                  backgroundColor: Colors.black,
+                  backgroundImage: CachedNetworkImageProvider(eachUser.url),
                 ),
+                title: Text(
+                  eachUser.profileName,
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text(eachUser.username,style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 13.0,
-
-                ),) ,
+                subtitle: Text(
+                  eachUser.username,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 13.0,
+                  ),
+                ),
               ),
-              onPressed: (){
-
-              },
+              onPressed: () {},
             )
           ],
         ),

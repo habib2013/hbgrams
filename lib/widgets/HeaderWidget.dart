@@ -13,6 +13,6 @@ AppBar header(context,{bool isAppTitle=false,String strTitle,disappearedBackButt
         overflow: TextOverflow.ellipsis,
     ),
     centerTitle: true,
-    backgroundColor: Theme.of(context).accentColor,
+    backgroundColor: Colors.white,
   );
 }
