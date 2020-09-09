@@ -23,8 +23,7 @@ class _UploadPageState extends State<UploadPage> with AutomaticKeepAliveClientMi
   File file;
   bool uploading = false;
   String postId = Uuid().v4();
-  TextEditingController descriptionTextEditingController =
-      TextEditingController();
+  TextEditingController descriptionTextEditingController = TextEditingController();
   TextEditingController locationTextEditingController = TextEditingController();
 
   captureImageWithCamera() async {

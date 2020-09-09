@@ -10,7 +10,7 @@ import 'package:hbgrams/pages/UploadPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:hbgrams/models/user.dart';
+
 
 final GoogleSignIn gSignIn =  GoogleSignIn();
 final usersReference = Firestore.instance.collection("users");
@@ -116,11 +116,11 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: PageView(
         children: [
-          RaisedButton.icon(onPressed: logoutUser, icon: Icon(Icons.close), label: Text("Sign Out User")),
+          TimeLinePage(),
           SearchPage(),
           UploadPage(gCurrentUser: currentUser,),
           NotificationsPage(),
-          ProfilePage(userProfileId: currentUser)
+          ProfilePage(userProfileId: currentUser.id),
         ],
         physics: NeverScrollableScrollPhysics(),
         controller: pageController,
